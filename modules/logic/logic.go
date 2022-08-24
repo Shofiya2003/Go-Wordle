@@ -80,10 +80,15 @@ func InitializeGame() {
 	}
 
 	if userWon {
-		fmt.Printf("Hurray! You Won")
+		fmt.Printf("\nHurray! You Won\n")
+
 	} else {
-		fmt.Printf("Oops! You lost this time")
+		fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
+
+		println()
 	}
+	println()
+	printFinalResult()
 
 }
 
@@ -100,6 +105,27 @@ func PrintResponseGrid() {
 		}
 		if count == 5 {
 			fmt.Println()
+			count = 0
+		}
+		count += 1
+	}
+
+	println()
+}
+
+func printFinalResult() {
+	count := 1
+	for _, pair := range userResponse {
+
+		if pair.status == 1 {
+			fmt.Printf("🟩 ")
+		} else if pair.status == 2 {
+			fmt.Printf("🟨 ")
+		} else if pair.status == -1 {
+			fmt.Printf("⬜ ")
+		}
+		if count == 5 {
+			fmt.Printf("\n\n")
 			count = 0
 		}
 		count += 1
