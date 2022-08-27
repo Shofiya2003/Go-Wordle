@@ -62,34 +62,40 @@ func compareResponseWithWord(word string, letters *[25]int) {
 }
 
 func InitializeGame() {
-	var chance = 1
-	userWon := false
-	for chance <= 5 && !userWon {
-		fmt.Printf("Enter the word\n")
-		fmt.Scan(&word)
-		if len(word) != 5 {
-			fmt.Printf("%v is not a valid word", word)
-			continue
+	playAgain := true
+	for playAgain {
+		wordOfDay = getWord()
+		var chance = 1
+		userWon := false
+		for chance <= 5 && !userWon {
+			fmt.Printf("Enter the word\n")
+			fmt.Scan(&word)
+			if len(word) != 5 {
+				fmt.Printf("%v is not a valid word", word)
+				continue
+			} else {
+				userWon = updateResponseGrid(word)
+				compareResponseWithWord(word, &letters)
+				PrintResponseGrid()
+				ui.PrintGrid(letters)
+				chance += 1
+			}
+		}
+
+		if userWon {
+			fmt.Printf("\nHurray! You Won\n")
+
 		} else {
-			userWon = updateResponseGrid(word)
-			compareResponseWithWord(word, &letters)
-			PrintResponseGrid()
-			ui.PrintGrid(letters)
-			chance += 1
+			fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
+		}
+		printFinalResult()
+		fmt.Printf("type 'Y' to play again")
+		userResponse := ""
+		fmt.Scan(&userResponse)
+		if userResponse != "Y" && userResponse != "y" {
+			playAgain = false
 		}
 	}
-
-	if userWon {
-		fmt.Printf("\nHurray! You Won\n")
-
-	} else {
-		fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
-
-		println()
-	}
-	println()
-	printFinalResult()
-
 }
 
 func PrintResponseGrid() {
