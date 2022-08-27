@@ -5,6 +5,7 @@ import (
 	"go_wordle/modules/helper"
 	"go_wordle/modules/ui"
 	"strings"
+	"sync"
 
 	"github.com/fatih/color"
 )
@@ -13,6 +14,7 @@ var letters [25]int
 var wordOfDay = "goods"
 var userResponse = make([]LetterPair, 0)
 var word string
+var wg sync.WaitGroup
 
 // struct to store the status and the letter entered by the user
 type LetterPair struct {
@@ -64,10 +66,20 @@ func compareResponseWithWord(word string, letters *[25]int) {
 func InitializeGame() {
 	playAgain := true
 	for playAgain {
-		wordOfDay = getWord()
+		if len(stockWords) == 0 {
+			getWord()
+		}
+		wordOfDay = stockWords[0]
+		stockWords = stockWords[1:len(stockWords)]
 		var chance = 1
+		var count = 1
 		userWon := false
 		for chance <= 5 && !userWon {
+			if len(stockWords) < 3 {
+				wg.Add(count)
+				count++
+				go getWord()
+			}
 			fmt.Printf("Enter the word\n")
 			fmt.Scan(&word)
 			if len(word) != 5 {
@@ -82,20 +94,27 @@ func InitializeGame() {
 			}
 		}
 
-		if userWon {
-			fmt.Printf("\nHurray! You Won\n")
-
-		} else {
-			fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
-		}
-		printFinalResult()
-		fmt.Printf("type 'Y' to play again")
-		userResponse := ""
-		fmt.Scan(&userResponse)
-		if userResponse != "Y" && userResponse != "y" {
-			playAgain = false
-		}
+		playAgain = concludeGame(userWon)
+		userResponse = make([]LetterPair, 0)
 	}
+	fmt.Printf("here the game ends")
+}
+
+func concludeGame(userWon bool) bool {
+	if userWon {
+		fmt.Printf("\nHurray! You Won\n")
+
+	} else {
+		fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
+	}
+	printFinalResult()
+	fmt.Printf("type 'Y' to play again\n")
+	doesUserWantToPlayAgain := ""
+	fmt.Scan(&doesUserWantToPlayAgain)
+	if doesUserWantToPlayAgain != "Y" && doesUserWantToPlayAgain != "y" {
+		return false
+	}
+	return true
 }
 
 func PrintResponseGrid() {
