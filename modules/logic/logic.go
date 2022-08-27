@@ -65,9 +65,13 @@ func compareResponseWithWord(word string, letters *[25]int) {
 
 func InitializeGame() {
 	playAgain := true
+	fmt.Printf("%s", color.YellowString("Welcome to go wordle 🎮🔡👯‍♀️!\n"))
+
 	for playAgain {
 		if len(stockWords) == 0 {
-			getWord()
+			if getWord() == -1 {
+				return
+			}
 		}
 		wordOfDay = stockWords[0]
 		stockWords = stockWords[1:len(stockWords)]
@@ -80,7 +84,7 @@ func InitializeGame() {
 				count++
 				go getWord()
 			}
-			fmt.Printf("Enter the word\n")
+			fmt.Printf("\nEnter the guess\n")
 			fmt.Scan(&word)
 			if len(word) != 5 {
 				fmt.Printf("%v is not a valid word", word)
@@ -102,10 +106,10 @@ func InitializeGame() {
 
 func concludeGame(userWon bool) bool {
 	if userWon {
-		fmt.Printf("\nHurray! You Won\n")
+		fmt.Printf("\n%s\n Correct word is %v\n\n", color.GreenString("Hurray! You Won"), color.CyanString(wordOfDay))
 
 	} else {
-		fmt.Printf("\nOops! You lost \n Correct word is %v\n", wordOfDay)
+		fmt.Printf("\nOops! You lost \n Correct word is %v\n\n", color.GreenString(wordOfDay))
 	}
 	printFinalResult()
 	fmt.Printf("type 'Y' to play again\n")
